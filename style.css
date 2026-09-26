@@ -1,13 +1,945 @@
 /* ========================================= */
-/* ====== 1. O'YINCHILAR YUGURISHI ========= */
+/* =============  UMUMIY  ================== */
 /* ========================================= */
+* { box-sizing: border-box; }
 
-/* O'yinchilar koptok orqasidan yuguradi */
-.player {
-  animation: runPlayer 3s ease-in-out infinite;
+body {
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  flex-wrap: wrap;
+  min-height: 100vh;
+  background: radial-gradient(circle at center, #1a0d2e 0%, #0a0515 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #fff;
 }
 
-/* Har xil kechikish */
+/* ========================================= */
+/* ===========  STADION  =================== */
+/* ========================================= */
+.stadium {
+  position: relative;
+  padding: 45px 45px 60px 45px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #2a1f3d, #0f0820);
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.8),
+    0 0 60px rgba(155,89,182,0.3),
+    inset 0 2px 4px rgba(255,255,255,0.1),
+    inset 0 -2px 6px rgba(0,0,0,0.6);
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.field {
+  position: relative;
+  width: 560px;
+  height: 900px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.55),
+    0 0 30px rgba(0,0,0,0.5),
+    0 0 40px rgba(46,204,113,0.2);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #2e8b3d 0px,    #2e8b3d 55px,
+      #277934 55px,   #277934 110px
+    );
+}
+
+.field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(155,89,182,0.20) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(52,152,219,0.15) 0%, transparent 55%);
+  z-index: 1;
+}
+
+/* ========================================= */
+/* ==== O'YIN VAQTI + HISOB PANELI ========= */
+/* ========================================= */
+.scoreboard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 40;
+  padding: 20px 16px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #2a1f3d, #1a1028);
+  border: 1px solid #9b59b6;
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.6),
+    0 0 20px rgba(155,89,182,0.2),
+    inset 0 1px 2px rgba(255,255,255,0.08);
+}
+
+.match-clock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #0d0d0d, #1f1f1f);
+  border: 2px solid #9b59b6;
+  box-shadow:
+    0 0 20px rgba(155,89,182,0.8),
+    0 0 40px rgba(155,89,182,0.4);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: #d7bde2;
+  text-shadow: 0 0 10px rgba(155,89,182,0.9);
+}
+
+.match-clock .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e74c3c;
+  box-shadow: 0 0 10px #e74c3c;
+  animation: clockPulse 1s ease-in-out infinite;
+}
+
+@keyframes clockPulse {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+.match-clock.ended {
+  border-color: #f1c40f;
+  color: #f1c40f;
+  box-shadow: 0 0 25px rgba(241,196,15,0.9);
+}
+
+.match-clock.ended .dot {
+  background: #f1c40f;
+  animation: none;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 32px;
+  border-radius: 36px;
+  background: linear-gradient(135deg, #0d0d0d, #1f1f1f);
+  border: 3px solid #f1c40f;
+  box-shadow:
+    0 0 25px rgba(241,196,15,0.7),
+    0 0 50px rgba(241,196,15,0.3),
+    0 8px 25px rgba(0,0,0,0.9),
+    inset 0 1px 2px rgba(255,255,255,0.15);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  letter-spacing: 3px;
+  animation: scoreGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes scoreGlow {
+  0%   { box-shadow: 0 0 25px rgba(241,196,15,0.7), 0 0 50px rgba(241,196,15,0.3), 0 8px 25px rgba(0,0,0,0.9), inset 0 1px 2px rgba(255,255,255,0.15); }
+  100% { box-shadow: 0 0 45px rgba(241,196,15,1), 0 0 80px rgba(241,196,15,0.5), 0 8px 25px rgba(0,0,0,0.9), inset 0 1px 2px rgba(255,255,255,0.15); }
+}
+
+.scoreboard .team-name {
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 900;
+}
+
+.scoreboard .team-name.home {
+  color: #5dade2;
+  text-shadow: 0 0 10px rgba(93,173,226,0.8);
+}
+
+.scoreboard .team-name.away {
+  color: #ec7063;
+  text-shadow: 0 0 10px rgba(236,112,99,0.8);
+}
+
+.scoreboard .score {
+  font-size: 42px;
+  color: #f1c40f;
+  text-shadow:
+    0 0 15px rgba(241,196,15,1),
+    0 0 30px rgba(241,196,15,0.6);
+  padding: 0 10px;
+  min-width: 50px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.scoreboard .score.bump {
+  animation: scoreBump 0.5s ease;
+}
+
+@keyframes scoreBump {
+  0%   { transform: scale(1);    color: #f1c40f; }
+  50%  { transform: scale(1.8);  color: #fff; text-shadow: 0 0 35px #fff, 0 0 60px #f1c40f; }
+  100% { transform: scale(1);    color: #f1c40f; }
+}
+
+.scoreboard .divider {
+  font-size: 36px;
+  color: #7f8c8d;
+  text-shadow: 0 0 10px rgba(127,140,141,0.5);
+}
+
+/* ========================================= */
+/* ====== G'OLIB MODAL OYNASI ============== */
+/* ========================================= */
+.winner-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  backdrop-filter: blur(8px);
+}
+
+.winner-modal.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.winner-card {
+  position: relative;
+  padding: 40px 60px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #2a1f3d, #0f0820);
+  border: 3px solid #f1c40f;
+  box-shadow:
+    0 0 80px rgba(241,196,15,0.9),
+    0 0 120px rgba(155,89,182,0.5),
+    0 25px 60px rgba(0,0,0,0.9);
+  text-align: center;
+  animation: winnerPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 90%;
+}
+
+@keyframes winnerPop {
+  0%   { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+  100% { transform: scale(1)   rotate(0deg);   opacity: 1; }
+}
+
+.winner-card .trophy {
+  font-size: 80px;
+  margin-bottom: 12px;
+  display: block;
+  animation: trophyBounce 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 25px #f1c40f);
+}
+
+@keyframes trophyBounce {
+  0%, 100% { transform: translateY(0)     scale(1);    }
+  50%      { transform: translateY(-12px) scale(1.1); }
+}
+
+.winner-card h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  color: #f1c40f;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-shadow: 0 0 25px rgba(241,196,15,0.9);
+}
+
+.winner-card .winner-name {
+  margin: 10px 0 20px 0;
+  font-size: 34px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px #f1c40f, 0 0 40px #e67e22;
+}
+
+.winner-card .final-score {
+  font-size: 52px;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #f1c40f;
+  letter-spacing: 8px;
+  text-shadow: 0 0 30px rgba(241,196,15,1);
+  margin-bottom: 24px;
+}
+
+.winner-card .close-btn {
+  padding: 14px 36px;
+  border-radius: 30px;
+  border: 2px solid #f1c40f;
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
+  color: #000;
+  font-weight: bold;
+  font-size: 15px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-transform: uppercase;
+}
+
+.winner-card .close-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(241,196,15,1);
+}
+
+/* ========================================= */
+/* =============  TRIBUNALAR  ============== */
+/* ========================================= */
+.stand-top {
+  position: absolute;
+  top: 8px; left: 32px; right: 32px;
+  height: 32px;
+  border-radius: 5px 5px 0 0;
+  background: repeating-linear-gradient(90deg, #4a4a4a 0px, #4a4a4a 10px, #3a3a3a 10px, #3a3a3a 20px);
+  box-shadow: inset 0 -4px 8px rgba(0,0,0,0.7), 0 3px 8px rgba(0,0,0,0.6);
+  overflow: hidden;
+  z-index: 5;
+}
+.stand-top::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 8%  30%, #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 16% 60%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 24% 25%, #f1c40f 0 2px, transparent 3px),
+    radial-gradient(circle at 32% 65%, #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 30%, #e67e22 0 2px, transparent 3px),
+    radial-gradient(circle at 48% 60%, #9b59b6 0 2px, transparent 3px),
+    radial-gradient(circle at 56% 25%, #1abc9c 0 2px, transparent 3px),
+    radial-gradient(circle at 64% 65%, #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 30%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 60%, #f1c40f 0 2px, transparent 3px),
+    radial-gradient(circle at 88% 25%, #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 95% 60%, #e67e22 0 2px, transparent 3px);
+  background-size: 100% 50%, 100% 50%;
+  background-position: 0 2px, 0 14px;
+  opacity: 0.9;
+  animation: crowdMove 3s ease-in-out infinite alternate;
+}
+
+.stand-bottom {
+  position: absolute;
+  bottom: 8px; left: 32px; right: 32px;
+  height: 32px;
+  border-radius: 0 0 5px 5px;
+  background: repeating-linear-gradient(90deg, #4a4a4a 0px, #4a4a4a 10px, #3a3a3a 10px, #3a3a3a 20px);
+  box-shadow: inset 0 4px 8px rgba(0,0,0,0.7), 0 -3px 8px rgba(0,0,0,0.6);
+  overflow: hidden;
+  z-index: 5;
+}
+.stand-bottom::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 6%  30%, #f1c40f 0 2px, transparent 3px),
+    radial-gradient(circle at 14% 60%, #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 22% 25%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 65%, #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 38% 30%, #9b59b6 0 2px, transparent 3px),
+    radial-gradient(circle at 46% 60%, #e67e22 0 2px, transparent 3px),
+    radial-gradient(circle at 54% 25%, #1abc9c 0 2px, transparent 3px),
+    radial-gradient(circle at 62% 65%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 30%, #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 60%, #f1c40f 0 2px, transparent 3px),
+    radial-gradient(circle at 86% 25%, #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 94% 60%, #9b59b6 0 2px, transparent 3px);
+  background-size: 100% 50%, 100% 50%;
+  background-position: 0 2px, 0 14px;
+  opacity: 0.9;
+  animation: crowdMove 3s ease-in-out infinite alternate-reverse;
+}
+
+.stand-left {
+  position: absolute;
+  top: 32px; bottom: 32px; left: 8px;
+  width: 32px;
+  border-radius: 5px 0 0 5px;
+  background: repeating-linear-gradient(0deg, #4a4a4a 0px, #4a4a4a 10px, #3a3a3a 10px, #3a3a3a 20px);
+  box-shadow: inset -4px 0 8px rgba(0,0,0,0.7), 3px 0 8px rgba(0,0,0,0.6);
+  overflow: hidden;
+  z-index: 5;
+}
+.stand-left::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 40% 8%,  #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 16%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 24%, #f1c40f 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 32%, #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 40%, #e67e22 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 48%, #9b59b6 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 56%, #1abc9c 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 64%, #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 72%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 80%, #f1c40f 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 88%, #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 96%, #e67e22 0 2px, transparent 3px);
+  opacity: 0.9;
+  animation: crowdMove 3s ease-in-out infinite alternate;
+}
+
+.stand-right {
+  position: absolute;
+  top: 32px; bottom: 32px; right: 8px;
+  width: 32px;
+  border-radius: 0 5px 5px 0;
+  background: repeating-linear-gradient(0deg, #4a4a4a 0px, #4a4a4a 10px, #3a3a3a 10px, #3a3a3a 20px);
+  box-shadow: inset 4px 0 8px rgba(0,0,0,0.7), -3px 0 8px rgba(0,0,0,0.6);
+  overflow: hidden;
+  z-index: 5;
+}
+.stand-right::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 40% 8%,  #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 16%, #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 24%, #9b59b6 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 32%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 40%, #f1c40f 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 48%, #1abc9c 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 56%, #e67e22 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 64%, #2ecc71 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 72%, #e74c3c 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 80%, #9b59b6 0 2px, transparent 3px),
+    radial-gradient(circle at 40% 88%, #3498db 0 2px, transparent 3px),
+    radial-gradient(circle at 60% 96%, #f1c40f 0 2px, transparent 3px);
+  opacity: 0.9;
+  animation: crowdMove 3s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes crowdMove {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+.corner {
+  position: absolute;
+  width: 32px; height: 32px;
+  z-index: 6;
+  background: radial-gradient(circle at center, #5a5a5a 0%, #2a2a2a 100%);
+  box-shadow: 0 0 8px rgba(0,0,0,0.7);
+}
+.corner.tl { top: 8px;    left: 8px;    border-radius: 6px 0 0 0; }
+.corner.tr { top: 8px;    right: 8px;   border-radius: 0 6px 0 0; }
+.corner.bl { bottom: 8px; left: 8px;    border-radius: 0 0 0 6px; }
+.corner.br { bottom: 8px; right: 8px;   border-radius: 0 0 6px 0; }
+
+/* ========================================= */
+/* =============  FANATLAR  ================ */
+/* ========================================= */
+.fans-row {
+  position: absolute;
+  left: 32px; right: 32px;
+  height: 36px;
+  z-index: 7;
+  pointer-events: none;
+}
+.fans-row.top    { top: -4px; }
+.fans-row.bottom { bottom: -4px; }
+
+.fan {
+  position: absolute;
+  bottom: 0;
+  width: 14px; height: 26px;
+  animation: fanJump 1.2s ease-in-out infinite;
+}
+.fan::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #f5c5a0;
+  box-shadow: 0 0 4px rgba(0,0,0,0.6);
+}
+.fan::after {
+  content: "";
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 12px; height: 16px;
+  border-radius: 3px 3px 2px 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+.fan.c1::after { background: linear-gradient(180deg, #e74c3c, #a93226); }
+.fan.c2::after { background: linear-gradient(180deg, #3498db, #1f618d); }
+.fan.c3::after { background: linear-gradient(180deg, #f1c40f, #b7950b); }
+.fan.c4::after { background: linear-gradient(180deg, #2ecc71, #1e8449); }
+.fan.c5::after { background: linear-gradient(180deg, #9b59b6, #6c3483); }
+.fan.c6::after { background: linear-gradient(180deg, #e67e22, #a04000); }
+.fan.c7::after { background: linear-gradient(180deg, #1abc9c, #117a65); }
+.fan.c8::after { background: linear-gradient(180deg, #ffffff, #bdc3c7); }
+
+@keyframes fanJump {
+  0%, 100% { transform: translateY(0)   scaleY(1); }
+  50%      { transform: translateY(-8px) scaleY(1.1); }
+}
+
+.fan:nth-child(1) { animation-delay: 0s;    }
+.fan:nth-child(2) { animation-delay: 0.15s; }
+.fan:nth-child(3) { animation-delay: 0.3s;  }
+.fan:nth-child(4) { animation-delay: 0.45s; }
+.fan:nth-child(5) { animation-delay: 0.6s;  }
+.fan:nth-child(6) { animation-delay: 0.75s; }
+.fan:nth-child(7) { animation-delay: 0.9s;  }
+.fan:nth-child(8) { animation-delay: 1.05s; }
+
+.flag {
+  position: absolute;
+  bottom: 26px;
+  width: 14px; height: 10px;
+  border-radius: 1px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  transform-origin: bottom left;
+  animation: flagWave 1.8s ease-in-out infinite;
+}
+.flag::after {
+  content: "";
+  position: absolute;
+  bottom: -10px; left: 1px;
+  width: 2px; height: 14px;
+  background: #7f8c8d;
+  border-radius: 1px;
+}
+.flag.f1 { background: linear-gradient(90deg, #e74c3c 50%, #f1c40f 50%); }
+.flag.f2 { background: linear-gradient(90deg, #3498db 50%, #ffffff 50%); }
+.flag.f3 { background: linear-gradient(90deg, #2ecc71 50%, #e74c3c 50%); }
+.flag.f4 { background: linear-gradient(90deg, #9b59b6 50%, #f1c40f 50%); }
+
+@keyframes flagWave {
+  0%, 100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(8deg);  }
+}
+
+.hands {
+  position: absolute;
+  bottom: 24px;
+  width: 16px; height: 10px;
+  animation: handsUp 0.8s ease-in-out infinite;
+}
+.hands::before,
+.hands::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 2px; height: 12px;
+  background: #f5c5a0;
+  border-radius: 2px;
+}
+.hands::before { left: 2px;  transform: rotate(-20deg); }
+.hands::after  { right: 2px; transform: rotate(20deg);  }
+
+@keyframes handsUp {
+  0%, 100% { transform: translateY(0);   }
+  50%      { transform: translateY(-4px); }
+}
+
+/* ========================================= */
+/* =============  OQ CHIZIQLAR  ============ */
+/* ========================================= */
+.line {
+  position: absolute;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 0 6px rgba(255,255,255,0.4);
+  z-index: 2;
+}
+.field-border {
+  position: absolute;
+  inset: 18px;
+  border: 2.5px solid rgba(255,255,255,0.9);
+  box-shadow: 0 0 6px rgba(255,255,255,0.4), inset 0 0 6px rgba(255,255,255,0.25);
+  z-index: 2;
+  pointer-events: none;
+}
+.center-line {
+  top: 50%; left: 18px; right: 18px;
+  height: 2.5px;
+  transform: translateY(-50%);
+}
+.center-circle {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 130px; height: 130px;
+  border: 2.5px solid rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 8px rgba(255,255,255,0.4);
+  z-index: 2;
+}
+.center-dot {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 8px; height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px rgba(255,255,255,0.7);
+  z-index: 3;
+}
+.penalty-box-top {
+  position: absolute;
+  top: 18px; left: 50%;
+  width: 260px; height: 110px;
+  border: 2.5px solid rgba(255,255,255,0.9);
+  border-top: none;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.penalty-box-bottom {
+  position: absolute;
+  bottom: 18px; left: 50%;
+  width: 260px; height: 110px;
+  border: 2.5px solid rgba(255,255,255,0.9);
+  border-bottom: none;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.goal-area-top {
+  position: absolute;
+  top: 18px; left: 50%;
+  width: 120px; height: 45px;
+  border: 2px solid rgba(255,255,255,0.85);
+  border-top: none;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.goal-area-bottom {
+  position: absolute;
+  bottom: 18px; left: 50%;
+  width: 120px; height: 45px;
+  border: 2px solid rgba(255,255,255,0.85);
+  border-bottom: none;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.goal-top {
+  position: absolute;
+  top: 18px; left: 50%;
+  width: 90px; height: 18px;
+  border: 3px solid #fff;
+  border-top: none;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.15) 100%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  z-index: 3;
+}
+.goal-bottom {
+  position: absolute;
+  bottom: 18px; left: 50%;
+  width: 90px; height: 18px;
+  border: 3px solid #fff;
+  border-bottom: none;
+  transform: translateX(-50%);
+  background: linear-gradient(0deg, transparent 0%, rgba(255,255,255,0.15) 100%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  z-index: 3;
+}
+.penalty-spot-top {
+  position: absolute;
+  top: 100px; left: 50%;
+  width: 6px; height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.penalty-spot-bottom {
+  position: absolute;
+  bottom: 100px; left: 50%;
+  width: 6px; height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+/* ========================================= */
+/* =============  KOPTOK  ================== */
+/* ========================================= */
+.ball-wrap {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 22px; height: 22px;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  transition: top 1.5s cubic-bezier(0.4, 0, 0.6, 1),
+              left 1.5s cubic-bezier(0.4, 0, 0.6, 1);
+}
+.ball {
+  position: relative;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: #f5f5f5;
+  overflow: hidden;
+  box-shadow:
+    inset -2px -2px 4px rgba(0,0,0,0.55),
+    inset 1.5px 1.5px 4px rgba(255,255,255,0.9),
+    0 2px 6px rgba(0,0,0,0.75),
+    0 0 0 1px rgba(0,0,0,0.25),
+    0 0 12px rgba(241,196,15,0.5);
+  animation: ballSpin 1.2s linear infinite;
+}
+.ball::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #111 0 2.3px, transparent 2.8px),
+    radial-gradient(circle at 72% 28%, #111 0 1.9px, transparent 2.3px),
+    radial-gradient(circle at 28% 28%, #111 0 1.9px, transparent 2.3px),
+    radial-gradient(circle at 72% 74%, #111 0 1.9px, transparent 2.3px),
+    radial-gradient(circle at 28% 74%, #111 0 1.9px, transparent 2.3px),
+    radial-gradient(circle at 50% 6%,  #111 0 1.6px, transparent 2px),
+    radial-gradient(circle at 50% 94%, #111 0 1.6px, transparent 2px),
+    radial-gradient(circle at 6% 50%,  #111 0 1.6px, transparent 2px),
+    radial-gradient(circle at 94% 50%, #111 0 1.6px, transparent 2px);
+}
+.ball::after {
+  content: "";
+  position: absolute;
+  top: 14%; left: 18%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 70%);
+  filter: blur(0.6px);
+}
+.ball-shadow {
+  position: absolute;
+  top: calc(50% + 13px); left: 50%;
+  width: 20px; height: 4px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  filter: blur(2.5px);
+  transform: translateX(-50%);
+  z-index: 5;
+  transition: top 1.5s cubic-bezier(0.4, 0, 0.6, 1),
+              left 1.5s cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes ballSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ========================================= */
+/* =============  GOOOL BANNERI  =========== */
+/* ========================================= */
+.goal-banner {
+  position: absolute;
+  top: 45%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+}
+.goal-banner.show {
+  animation: showGoal 1.8s ease-out;
+}
+.goal-banner span {
+  display: inline-block;
+  font-size: 58px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  background: linear-gradient(135deg, #f1c40f, #9b59b6, #f1c40f);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px #9b59b6) drop-shadow(0 0 25px #f1c40f);
+  animation: pulseGoal 0.6s ease-in-out infinite alternate;
+}
+@keyframes showGoal {
+  0%   { transform: translate(-50%, -50%) scale(0)   rotate(-15deg); opacity: 0; }
+  20%  { transform: translate(-50%, -50%) scale(1.3) rotate(5deg);   opacity: 1; }
+  30%  { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   opacity: 1; }
+  80%  { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0)   rotate(15deg);  opacity: 0; }
+}
+@keyframes pulseGoal {
+  0%   { filter: brightness(1)   drop-shadow(0 0 15px #9b59b6) drop-shadow(0 0 25px #f1c40f); }
+  100% { filter: brightness(1.4) drop-shadow(0 0 25px #9b59b6) drop-shadow(0 0 40px #f1c40f); }
+}
+
+/* ========================================= */
+/* =============  KONFETTI  ================ */
+/* ========================================= */
+.confetti-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 45;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.confetti-layer.active {
+  opacity: 1;
+}
+.confetti {
+  position: absolute;
+  top: -20px;
+  width: 8px;
+  height: 12px;
+  opacity: 0;
+}
+.confetti:nth-child(odd)  { border-radius: 2px; }
+.confetti:nth-child(even) { border-radius: 50%; }
+
+.confetti.c1 { background: #e74c3c; }
+.confetti.c2 { background: #f1c40f; }
+.confetti.c3 { background: #3498db; }
+.confetti.c4 { background: #2ecc71; }
+.confetti.c5 { background: #9b59b6; }
+.confetti.c6 { background: #e67e22; }
+.confetti.c7 { background: #1abc9c; }
+.confetti.c8 { background: #ffffff; }
+
+.confetti-layer.active .confetti {
+  animation: confettiFall 2.5s linear forwards;
+}
+.confetti-layer.active .confetti:nth-child(1)  { animation-delay: 0s;    left:  4%; }
+.confetti-layer.active .confetti:nth-child(2)  { animation-delay: 0.1s;  left: 10%; }
+.confetti-layer.active .confetti:nth-child(3)  { animation-delay: 0.2s;  left: 16%; }
+.confetti-layer.active .confetti:nth-child(4)  { animation-delay: 0.3s;  left: 22%; }
+.confetti-layer.active .confetti:nth-child(5)  { animation-delay: 0.4s;  left: 28%; }
+.confetti-layer.active .confetti:nth-child(6)  { animation-delay: 0.5s;  left: 34%; }
+.confetti-layer.active .confetti:nth-child(7)  { animation-delay: 0.6s;  left: 40%; }
+.confetti-layer.active .confetti:nth-child(8)  { animation-delay: 0.7s;  left: 46%; }
+.confetti-layer.active .confetti:nth-child(9)  { animation-delay: 0.8s;  left: 52%; }
+.confetti-layer.active .confetti:nth-child(10) { animation-delay: 0.9s;  left: 58%; }
+.confetti-layer.active .confetti:nth-child(11) { animation-delay: 1.0s;  left: 64%; }
+.confetti-layer.active .confetti:nth-child(12) { animation-delay: 1.1s;  left: 70%; }
+.confetti-layer.active .confetti:nth-child(13) { animation-delay: 1.2s;  left: 76%; }
+.confetti-layer.active .confetti:nth-child(14) { animation-delay: 1.3s;  left: 82%; }
+.confetti-layer.active .confetti:nth-child(15) { animation-delay: 1.4s;  left: 88%; }
+.confetti-layer.active .confetti:nth-child(16) { animation-delay: 1.5s;  left: 94%; }
+
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(920px) rotate(720deg); opacity: 0; }
+}
+
+/* ========================================= */
+/* =============  O'YINCHILAR  ============= */
+/* ========================================= */
+.player {
+  position: absolute;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  overflow: visible;
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.5),
+    0 6px 14px rgba(0,0,0,0.75),
+    inset 0 0 8px rgba(0,0,0,0.4);
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: #333;
+  animation: runPlayer 3s ease-in-out infinite;
+  transition: top 1.5s cubic-bezier(0.4, 0, 0.6, 1),
+              left 1.5s cubic-bezier(0.4, 0, 0.6, 1),
+              box-shadow 0.25s;
+  cursor: pointer;
+}
+.player img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.player:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  z-index: 30;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 20px rgba(255,255,255,0.6),
+    0 8px 20px rgba(0,0,0,0.8);
+}
+
+/* TANLANGAN O'YINCHI */
+.player.selected {
+  box-shadow:
+    0 0 0 4px #2ecc71,
+    0 0 25px #2ecc71,
+    0 0 45px rgba(46,204,113,0.7),
+    0 6px 14px rgba(0,0,0,0.75);
+  animation: selectedPulse 0.8s ease-in-out infinite alternate;
+  z-index: 35;
+}
+@keyframes selectedPulse {
+  0%   { box-shadow: 0 0 0 4px #2ecc71, 0 0 25px #2ecc71, 0 0 45px rgba(46,204,113,0.7), 0 6px 14px rgba(0,0,0,0.75); }
+  100% { box-shadow: 0 0 0 4px #2ecc71, 0 0 35px #2ecc71, 0 0 65px rgba(46,204,113,1),   0 6px 14px rgba(0,0,0,0.75); }
+}
+
+.player .num {
+  position: absolute;
+  bottom: -3px; right: -3px;
+  background: linear-gradient(135deg, #000, #333);
+  color: #fff;
+  font-size: 9px;
+  font-weight: bold;
+  width: 17px; height: 17px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+.player::after {
+  content: "";
+  position: absolute;
+  bottom: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 30px; height: 4px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  filter: blur(2px);
+  z-index: -1;
+  animation: runShadow 0.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes runPlayer {
+  0%   { transform: translate(-50%, -50%) scale(1);    }
+  25%  { transform: translate(-50%, -50%) scale(1.08); }
+  50%  { transform: translate(-50%, -50%) scale(1.12); }
+  75%  { transform: translate(-50%, -50%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1);    }
+}
+@keyframes runShadow {
+  0%   { transform: translateX(-50%) scaleX(0.8); opacity: 0.3; }
+  100% { transform: translateX(-50%) scaleX(1.2); opacity: 0.5; }
+}
+
 .h-f1 { animation-delay: 0s;    }
 .h-f2 { animation-delay: 0.15s; }
 .h-f3 { animation-delay: 0.3s;  }
@@ -32,265 +964,330 @@
 .a-d4 { animation-delay: 1.55s; }
 .a-g1 { animation-delay: 1.7s;  }
 
-@keyframes runPlayer {
-  0%   { transform: translate(-50%, -50%) scale(1);    }
-  25%  { transform: translate(-50%, -50%) scale(1.08); }
-  50%  { transform: translate(-50%, -50%) scale(1.12); }
-  75%  { transform: translate(-50%, -50%) scale(1.05); }
-  100% { transform: translate(-50%, -50%) scale(1);    }
-}
+.home-team .gk  { border-color: #f1c40f; box-shadow: 0 0 12px rgba(241,196,15,0.6), 0 6px 14px rgba(0,0,0,0.75); }
+.home-team .def { border-color: #3498db; box-shadow: 0 0 12px rgba(52,152,219,0.6), 0 6px 14px rgba(0,0,0,0.75); }
+.home-team .mid { border-color: #2ecc71; box-shadow: 0 0 12px rgba(46,204,113,0.6), 0 6px 14px rgba(0,0,0,0.75); }
+.home-team .fwd { border-color: #e74c3c; box-shadow: 0 0 12px rgba(231,76,60,0.6), 0 6px 14px rgba(0,0,0,0.75); }
 
-/* Oyoq harakati soyasi */
-.player::after {
-  content: "";
+.away-team .gk  { border-color: #f39c12; box-shadow: 0 0 12px rgba(243,156,18,0.6), 0 6px 14px rgba(0,0,0,0.75); }
+.away-team .def { border-color: #9b59b6; box-shadow: 0 0 12px rgba(155,89,182,0.6), 0 6px 14px rgba(0,0,0,0.75); }
+.away-team .mid { border-color: #1abc9c; box-shadow: 0 0 12px rgba(26,188,156,0.6), 0 6px 14px rgba(0,0,0,0.75); }
+.away-team .fwd { border-color: #e67e22; box-shadow: 0 0 12px rgba(230,126,34,0.6), 0 6px 14px rgba(0,0,0,0.75); }
+
+.h-g1 { top: 5%;  left: 50%; }
+.h-d1 { top: 22%; left: 12%; }
+.h-d2 { top: 20%; left: 38%; }
+.h-d3 { top: 20%; left: 62%; }
+.h-d4 { top: 22%; left: 88%; }
+.h-m1 { top: 37%; left: 25%; }
+.h-m2 { top: 39%; left: 50%; }
+.h-m3 { top: 37%; left: 75%; }
+.h-f1 { top: 52%; left: 22%; }
+.h-f2 { top: 54%; left: 50%; }
+.h-f3 { top: 52%; left: 78%; }
+.a-f1 { top: 48%; left: 22%; }
+.a-f2 { top: 46%; left: 50%; }
+.a-f3 { top: 48%; left: 78%; }
+.a-m1 { top: 63%; left: 25%; }
+.a-m2 { top: 61%; left: 50%; }
+.a-m3 { top: 63%; left: 75%; }
+.a-d1 { top: 78%; left: 12%; }
+.a-d2 { top: 80%; left: 38%; }
+.a-d3 { top: 80%; left: 62%; }
+.a-d4 { top: 78%; left: 88%; }
+.a-g1 { top: 95%; left: 50%; }
+
+.team-label {
   position: absolute;
-  bottom: -6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 30px;
-  height: 4px;
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  z-index: 25;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+.team-label.home {
+  top: 8px;
+  background: linear-gradient(135deg, #2980b9, #1c5d8a);
+  border: 2px solid #5dade2;
+  box-shadow: 0 4px 14px rgba(93,173,226,0.6);
+}
+.team-label.away {
+  bottom: 8px;
+  background: linear-gradient(135deg, #c0392b, #8b2a1f);
+  border: 2px solid #ec7063;
+  box-shadow: 0 4px 14px rgba(236,112,99,0.6);
+}
+
+/* ========================================= */
+/* =============  YON PANEL  =============== */
+/* ========================================= */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 340px;
+}
+.panel-box {
+  background: linear-gradient(145deg, #2a1f3d, #1a1028);
+  border: 1px solid #9b59b6;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(155,89,182,0.2), inset 0 1px 2px rgba(255,255,255,0.08);
+}
+.panel-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #9b59b6;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.panel-title.coach      { color: #f1c40f; text-shadow: 0 0 10px rgba(241,196,15,0.5); }
+.panel-title.away-coach { color: #ec7063; text-shadow: 0 0 10px rgba(236,112,99,0.5); }
+.panel-title.bench      { color: #5dade2; text-shadow: 0 0 10px rgba(93,173,226,0.5); }
+
+.coach-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #383838, #2a2a2a);
+  padding: 10px;
+  border-radius: 10px;
+  border-left: 5px solid #f1c40f;
+  margin-bottom: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+.coach-card.away {
+  border-left-color: #ec7063;
+  margin-bottom: 0;
+}
+.coach-avatar {
+  width: 52px; height: 52px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.35);
-  filter: blur(2px);
-  z-index: -1;
-  animation: runShadow 0.5s ease-in-out infinite alternate;
+  overflow: hidden;
+  border: 3px solid #f1c40f;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(241,196,15,0.5);
 }
-
-@keyframes runShadow {
-  0%   { transform: translateX(-50%) scaleX(0.8); opacity: 0.3; }
-  100% { transform: translateX(-50%) scaleX(1.2); opacity: 0.5; }
+.coach-card.away .coach-avatar {
+  border-color: #ec7063;
+  box-shadow: 0 0 12px rgba(236,112,99,0.5);
 }
-
-/* ========================================= */
-/* ====== 2. KOPTOKNI UZATISH ============== */
-/* ========================================= */
-
-.ball-wrap {
-  animation: passBall 6s ease-in-out infinite,
-             ballBounce 0.8s ease-in-out infinite;
-  z-index: 15;
+.coach-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
 }
-
-/* Koptok o'yinchidan o'yinchiga "uzatiladi" */
-@keyframes passBall {
-  0%   { top: 5%;  left: 50%; }   /* Buffon */
-  15%  { top: 20%; left: 38%; }   /* Cafu */
-  30%  { top: 39%; left: 50%; }   /* Xavi */
-  45%  { top: 52%; left: 22%; }   /* Messi */
-  60%  { top: 50%; left: 50%; }   /* Markaz */
-  75%  { top: 52%; left: 78%; }   /* Ronaldo */
-  90%  { top: 39%; left: 50%; }   /* Xavi */
-  100% { top: 5%;  left: 50%; }   /* Buffon */
-}
-
-/* Koptok soyasi */
-.ball-shadow {
-  animation: shadowPulse 0.8s ease-in-out infinite,
-             passShadow 6s ease-in-out infinite;
-  z-index: 5;
-}
-
-@keyframes passShadow {
-  0%   { top: calc(5%  + 17px); left: 50%; }
-  15%  { top: calc(20% + 17px); left: 38%; }
-  30%  { top: calc(39% + 17px); left: 50%; }
-  45%  { top: calc(52% + 17px); left: 22%; }
-  60%  { top: calc(50% + 17px); left: 50%; }
-  75%  { top: calc(52% + 17px); left: 78%; }
-  90%  { top: calc(39% + 17px); left: 50%; }
-  100% { top: calc(5%  + 17px); left: 50%; }
-}
-
-/* ========================================= */
-/* ====== 3. GOOOL BANNERI ================= */
-/* ========================================= */
-
-.goal-banner {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  z-index: 50;
-  pointer-events: none;
-  animation: showGoal 6s ease-in-out infinite;
-}
-
-.goal-banner span {
-  display: inline-block;
-  font-size: 58px;
-  font-weight: 900;
-  letter-spacing: 8px;
+.coach-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
   color: #fff;
-  text-shadow:
-    0 0 10px #f1c40f,
-    0 0 20px #f1c40f,
-    0 0 40px #e67e22,
-    0 0 60px #e74c3c,
-    0 6px 12px rgba(0,0,0,0.9);
-  background: linear-gradient(135deg, #f1c40f, #e74c3c, #f1c40f);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: pulseGoal 0.6s ease-in-out infinite alternate;
+}
+.coach-info p {
+  margin: 0;
+  font-size: 11px;
+  color: #999;
 }
 
-@keyframes showGoal {
-  0%, 40%  { transform: translate(-50%, -50%) scale(0)   rotate(-15deg); opacity: 0; }
-  50%      { transform: translate(-50%, -50%) scale(1.3) rotate(5deg);   opacity: 1; }
-  55%      { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   opacity: 1; }
-  80%      { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   opacity: 1; }
-  90%, 100%{ transform: translate(-50%, -50%) scale(0)   rotate(15deg);  opacity: 0; }
-}
-
-@keyframes pulseGoal {
-  0%   { filter: brightness(1);   }
-  100% { filter: brightness(1.4); }
-}
 /* ========================================= */
-/* ====== 1. O'YINCHILAR YUGURISHI ========= */
+/* =========  ZAXIRA O'RINDIQ  ============= */
 /* ========================================= */
-
-/* O'yinchilar koptok orqasidan yuguradi */
-.player {
-  animation: runPlayer 3s ease-in-out infinite;
+.bench-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
-
-/* Har xil kechikish */
-.h-f1 { animation-delay: 0s;    }
-.h-f2 { animation-delay: 0.15s; }
-.h-f3 { animation-delay: 0.3s;  }
-.h-m1 { animation-delay: 0.5s;  }
-.h-m2 { animation-delay: 0.65s; }
-.h-m3 { animation-delay: 0.8s;  }
-.h-d1 { animation-delay: 1.0s;  }
-.h-d2 { animation-delay: 1.15s; }
-.h-d3 { animation-delay: 1.3s;  }
-.h-d4 { animation-delay: 1.45s; }
-.h-g1 { animation-delay: 1.6s;  }
-
-.a-f1 { animation-delay: 0.1s;  }
-.a-f2 { animation-delay: 0.25s; }
-.a-f3 { animation-delay: 0.4s;  }
-.a-m1 { animation-delay: 0.6s;  }
-.a-m2 { animation-delay: 0.75s; }
-.a-m3 { animation-delay: 0.9s;  }
-.a-d1 { animation-delay: 1.1s;  }
-.a-d2 { animation-delay: 1.25s; }
-.a-d3 { animation-delay: 1.4s;  }
-.a-d4 { animation-delay: 1.55s; }
-.a-g1 { animation-delay: 1.7s;  }
-
-@keyframes runPlayer {
-  0%   { transform: translate(-50%, -50%) scale(1);    }
-  25%  { transform: translate(-50%, -50%) scale(1.08); }
-  50%  { transform: translate(-50%, -50%) scale(1.12); }
-  75%  { transform: translate(-50%, -50%) scale(1.05); }
-  100% { transform: translate(-50%, -50%) scale(1);    }
+.bench-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #383838, #2a2a2a);
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
-
-/* Oyoq harakati soyasi */
-.player::after {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 4px;
+.bench-player:hover {
+  transform: scale(1.05);
+  border-color: #5dade2;
+  box-shadow: 0 0 15px rgba(93,173,226,0.6);
+}
+.bench-player.bench-selected {
+  border-color: #2ecc71;
+  box-shadow: 0 0 20px rgba(46,204,113,0.8);
+  animation: benchPulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes benchPulse {
+  0%   { box-shadow: 0 0 20px rgba(46,204,113,0.8); }
+  100% { box-shadow: 0 0 30px rgba(46,204,113,1); }
+}
+.bench-photo {
+  width: 30px; height: 30px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.35);
-  filter: blur(2px);
-  z-index: -1;
-  animation: runShadow 0.5s ease-in-out infinite alternate;
+  overflow: hidden;
+  border: 2px solid #fff;
+  flex-shrink: 0;
+}
+.bench-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.bench-photo.gk  { border-color: #f1c40f; }
+.bench-photo.def { border-color: #3498db; }
+.bench-photo.mid { border-color: #2ecc71; }
+.bench-photo.fwd { border-color: #e74c3c; }
+.bench-player span {
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-@keyframes runShadow {
-  0%   { transform: translateX(-50%) scaleX(0.8); opacity: 0.3; }
-  100% { transform: translateX(-50%) scaleX(1.2); opacity: 0.5; }
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
 }
-
-/* ========================================= */
-/* ====== 2. KOPTOKNI UZATISH ============== */
-/* ========================================= */
-
-.ball-wrap {
-  animation: passBall 6s ease-in-out infinite,
-             ballBounce 0.8s ease-in-out infinite;
-  z-index: 15;
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
-/* Koptok o'yinchidan o'yinchiga "uzatiladi" */
-@keyframes passBall {
-  0%   { top: 5%;  left: 50%; }   /* Buffon */
-  15%  { top: 20%; left: 38%; }   /* Cafu */
-  30%  { top: 39%; left: 50%; }   /* Xavi */
-  45%  { top: 52%; left: 22%; }   /* Messi */
-  60%  { top: 50%; left: 50%; }   /* Markaz */
-  75%  { top: 52%; left: 78%; }   /* Ronaldo */
-  90%  { top: 39%; left: 50%; }   /* Xavi */
-  100% { top: 5%;  left: 50%; }   /* Buffon */
+.legend-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  flex-shrink: 0;
 }
+.legend-dot.gk  { border-color: #f1c40f; background: #f1c40f33; }
+.legend-dot.def { border-color: #3498db; background: #3498db33; }
+.legend-dot.mid { border-color: #2ecc71; background: #2ecc7133; }
+.legend-dot.fwd { border-color: #e74c3c; background: #e74c3c33; }
 
-/* Koptok soyasi */
-.ball-shadow {
-  animation: shadowPulse 0.8s ease-in-out infinite,
-             passShadow 6s ease-in-out infinite;
-  z-index: 5;
-}
-
-@keyframes passShadow {
-  0%   { top: calc(5%  + 17px); left: 50%; }
-  15%  { top: calc(20% + 17px); left: 38%; }
-  30%  { top: calc(39% + 17px); left: 50%; }
-  45%  { top: calc(52% + 17px); left: 22%; }
-  60%  { top: calc(50% + 17px); left: 50%; }
-  75%  { top: calc(52% + 17px); left: 78%; }
-  90%  { top: calc(39% + 17px); left: 50%; }
-  100% { top: calc(5%  + 17px); left: 50%; }
-}
-
-/* ========================================= */
-/* ====== 3. GOOOL BANNERI ================= */
-/* ========================================= */
-
-.goal-banner {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  z-index: 50;
-  pointer-events: none;
-  animation: showGoal 6s ease-in-out infinite;
-}
-
-.goal-banner span {
-  display: inline-block;
-  font-size: 58px;
-  font-weight: 900;
-  letter-spacing: 8px;
+/* Ovoz tugmasi */
+.sound-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  border: 2px solid #fff;
   color: #fff;
-  text-shadow:
-    0 0 10px #f1c40f,
-    0 0 20px #f1c40f,
-    0 0 40px #e67e22,
-    0 0 60px #e74c3c,
-    0 6px 12px rgba(0,0,0,0.9);
-  background: linear-gradient(135deg, #f1c40f, #e74c3c, #f1c40f);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: pulseGoal 0.6s ease-in-out infinite alternate;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 200;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 0 20px rgba(155,89,182,0.5);
+  transition: transform 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.sound-toggle:hover { transform: scale(1.1); }
+.sound-toggle.muted { background: linear-gradient(135deg, #7f8c8d, #34495e); color: #fff; }
+
+/* ========================================= */
+/* ========  ALMASHTIRISH XABARI  ========= */
+/* ========================================= */
+.sub-toast {
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-30px);
+  padding: 12px 28px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 1px;
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s, transform 0.4s;
+  box-shadow: 0 8px 25px rgba(46,204,113,0.7), 0 0 40px rgba(46,204,113,0.4);
+  border: 2px solid #fff;
+}
+.sub-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
-@keyframes showGoal {
-  0%, 40%  { transform: translate(-50%, -50%) scale(0)   rotate(-15deg); opacity: 0; }
-  50%      { transform: translate(-50%, -50%) scale(1.3) rotate(5deg);   opacity: 1; }
-  55%      { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   opacity: 1; }
-  80%      { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   opacity: 1; }
-  90%, 100%{ transform: translate(-50%, -50%) scale(0)   rotate(15deg);  opacity: 0; }
+/* ========================================= */
+/* =============  MOBIL VERSIYA  =========== */
+/* ========================================= */
+@media (max-width: 768px) {
+  body {
+    padding: 8px;
+    gap: 12px;
+  }
+
+  .stadium {
+    padding: 32px 24px 40px 24px;
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
+
+  .match-clock {
+    font-size: 16px;
+    padding: 6px 18px;
+  }
+
+  .score-row {
+    padding: 8px 22px;
+    gap: 12px;
+  }
+
+  .scoreboard .score { font-size: 32px; }
+  .scoreboard .team-name { font-size: 13px; }
+  .scoreboard .divider { font-size: 28px; }
+
+  .side-panel {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .sound-toggle {
+    width: 42px;
+    height: 42px;
+    top: 12px;
+    right: 12px;
+  }
+
+  .winner-card {
+    padding: 28px 36px;
+  }
+
+  .winner-card .trophy { font-size: 56px; }
+  .winner-card h2 { font-size: 18px; letter-spacing: 2px; }
+  .winner-card .winner-name { font-size: 24px; }
+  .winner-card .final-score { font-size: 36px; letter-spacing: 4px; }
 }
 
-@keyframes pulseGoal {
-  0%   { filter: brightness(1);   }
-  100% { filter: brightness(1.4); }
+@media (max-width: 480px) {
+  .stadium {
+    transform: scale(0.7);
+    transform-origin: top center;
+  }
+
+  .scoreboard .score { font-size: 26px; }
+  .match-clock { font-size: 14px; padding: 4px 14px; }
+
+  .winner-card { padding: 22px 26px; }
+  .winner-card .trophy { font-size: 44px; }
+  .winner-card h2 { font-size: 16px; }
+  .winner-card .winner-name { font-size: 20px; }
+  .winner-card .final-score { font-size: 30px; letter-spacing: 3px; }
+  .winner-card .close-btn { padding: 10px 24px; font-size: 13px; }
 }
